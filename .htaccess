@@ -1,0 +1,29 @@
+# =====================================================================
+#  Корневой .htaccess
+#  Вариант A: DocumentRoot смотрит на корень проекта.
+#  Перенаправляет всё в public/ и закрывает служебные каталоги.
+#  Если DocumentRoot уже указывает на public/ — этот файл не мешает.
+# =====================================================================
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+
+    # Запрет прямого доступа к служебным каталогам
+    RewriteRule ^(app|logs|migrations|seeds|tools)(/|$) - [F,L]
+
+    # Файлы, которых нет физически в корне, уводим в public/
+    RewriteCond %{REQUEST_URI} !^/public/
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>
+
+# Запрет листинга и доступа к скрытым файлам
+Options -Indexes
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>
+
+# Кодировка по умолчанию
+AddDefaultCharset UTF-8
