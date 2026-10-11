@@ -1,0 +1,26 @@
+# =====================================================================
+#  public/uploads/.htaccess — безопасность загруженных файлов
+#  Полный запрет выполнения скриптов в папке загрузок.
+# =====================================================================
+
+# Отключаем интерпретатор PHP (Apache mod_php)
+php_flag engine off
+
+# На всякий случай — для PHP-FPM через handler
+<IfModule mod_mime.c>
+    RemoveHandler .php .phtml .php3 .php4 .php5 .php7 .phps .pl .py .cgi .asp .aspx .sh .shtml
+    AddType text/plain .php .phtml .php3 .php4 .php5 .php7 .phps .pl .py .cgi .asp .aspx .sh .shtml
+</IfModule>
+
+# Жёсткий запрет опасных расширений
+<FilesMatch "\.(php|phtml|php3|php4|php5|php7|phps|pl|py|cgi|asp|aspx|sh|shtml|htaccess)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+Options -ExecCGI -Indexes -FollowSymLinks
